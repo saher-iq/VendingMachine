@@ -2,11 +2,29 @@
 #include <gtest/gtest.h>
 #include <sstream>
 #include <iostream>
+#include <string>
 
 #include "Product.h"
 #include "VendingMachine.h"
 
-// Test 1: Check product name and price
+// Helper function to capture console output.
+std::string captureOutput(VendingMachine& machine, int choice, int money) {
+    std::ostringstream output;
+    std::streambuf* oldOutput = std::cout.rdbuf(output.rdbuf());
+
+    try {
+        machine.buyProduct(choice, money);
+    }
+    catch (...) {
+        std::cout.rdbuf(oldOutput);
+        throw;
+    }
+
+    std::cout.rdbuf(oldOutput);
+    return output.str();
+}
+
+// Test 1: Check product name and price.
 TEST(ProductTests, WaterHasCorrectNameAndPrice) {
     Product water("Water", 500);
 
@@ -14,7 +32,7 @@ TEST(ProductTests, WaterHasCorrectNameAndPrice) {
     EXPECT_EQ(water.getPrice(), 500);
 }
 
-// Test 2: Check that a valid product can be selected
+// Test 2: Check that valid products can be selected.
 TEST(VendingMachineTests, ValidProductCanBeSelected) {
     VendingMachine machine;
 
@@ -23,7 +41,7 @@ TEST(VendingMachineTests, ValidProductCanBeSelected) {
     EXPECT_NE(machine.getProduct(3), nullptr);
 }
 
-// Test 3: Invalid product choice should return nullptr
+// Test 3: Invalid product choices should return nullptr.
 TEST(VendingMachineTests, InvalidProductReturnsNullptr) {
     VendingMachine machine;
 
@@ -31,49 +49,66 @@ TEST(VendingMachineTests, InvalidProductReturnsNullptr) {
     EXPECT_EQ(machine.getProduct(4), nullptr);
 }
 
-// Test 4: Buying with insufficient money should report an error
+// Test 4: Insufficient money should show an error.
 TEST(VendingMachineTests, InsufficientMoneyShowsMessage) {
     VendingMachine machine;
 
-    std::ostringstream output;
-    std::streambuf* oldOutput = std::cout.rdbuf(output.rdbuf());
+    std::string output = captureOutput(machine, 1, 200);
 
-    machine.buyProduct(1, 200);
-
-    std::cout.rdbuf(oldOutput);
-
-    EXPECT_NE(
-        output.str().find("Not enough money!"),
-        std::string::npos
-    );
+    EXPECT_NE(output.find("Not enough money!"), std::string::npos);
+    EXPECT_NE(output.find("300 IQD more"), std::string::npos);
 }
 
-// Test 5: Buying with enough money should succeed
-
+// Test 5: A purchase with exact money should succeed.
 TEST(VendingMachineTests, SufficientMoneyCompletesPurchase) {
     VendingMachine machine;
 
-    std::ostringstream output;
-    std::streambuf* oldOutput = std::cout.rdbuf(output.rdbuf());
+    std::string output = captureOutput(machine, 1, 500);
 
-    try {
-        machine.buyProduct(1, 500);
-    }
-    catch (...) {
-        std::cout.rdbuf(oldOutput);
-        throw;
-    }
-
-    std::cout.rdbuf(oldOutput);
-
-    EXPECT_NE(
-        output.str().find("Purchase successful!"),
-        std::string::npos
-    );
-
-    EXPECT_NE(
-        output.str().find("Change: 0 IQD"),
-        std::string::npos
-    );
+    EXPECT_NE(output.find("Purchase successful!"), std::string::npos);
+    EXPECT_NE(output.find("Change: 0 IQD"), std::string::npos);
 }
 
+// Test 6: An invalid product choice should show an error.
+TEST(VendingMachineTests, InvalidChoiceShowsMessage) {
+    VendingMachine machine;
+
+    std::string output = captureOutput(machine, 4, 1000);
+
+    EXPECT_NE(output.find("Invalid choice!"), std::string::npos);
+}
+
+// Test 7: Negative money should be rejected.
+TEST(VendingMachineTests, NegativeMoneyShowsMessage) {
+    VendingMachine machine;
+
+    std::string output = captureOutput(machine, 1, -100);
+
+    EXPECT_NE(output.find("Invalid amount!"), std::string::npos);
+}
+
+// Test 8: Extra money should produce the correct change.
+TEST(VendingMachineTests, ExtraMoneyReturnsCorrectChange) {
+    VendingMachine machine;
+
+    std::string output = captureOutput(machine, 1, 700);
+
+    EXPECT_NE(output.find("Purchase successful!"), std::string::npos);
+    EXPECT_NE(output.find("Change: 200 IQD"), std::string::npos);
+}
+
+// Test 9: The machine should return to ReadyState after a purchase.
+TEST(VendingMachineTests, MachineReturnsToReadyStateAfterPurchase) {
+    VendingMachine machine;
+
+    captureOutput(machine, 1, 500);
+
+    EXPECT_EQ(machine.getReadyState(), machine.getDispensingState() == nullptr
+        ? nullptr
+        : machine.getReadyState());
+
+    std::string output = captureOutput(machine, 2, 1000);
+
+    EXPECT_NE(output.find("Purchase successful!"), std::string::npos);
+    EXPECT_NE(output.find("Product: Juice"), std::string::npos);
+}
