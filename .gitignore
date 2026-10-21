@@ -1,0 +1,16 @@
+
+# Build output
+build/
+
+# Visual Studio files
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.user
+
+# Debug symbols
+*.pdb
+*.ilk
+*.obj
+*.exe
