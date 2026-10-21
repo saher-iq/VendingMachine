@@ -41,6 +41,9 @@ Product* VendingMachine::getProduct(int choice) {
 void VendingMachine::setState(State* state) {
     currentState = state;
 }
+State* VendingMachine::getCurrentState() const {
+    return currentState;
+}
 
 State* VendingMachine::getReadyState() {
     return &readyState;

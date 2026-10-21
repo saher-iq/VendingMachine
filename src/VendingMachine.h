@@ -23,9 +23,13 @@ public:
 
     Product* getProduct(int choice);
     void setState(State* state);
+    State* getCurrentState() const;
 
     State* getReadyState();
     State* getDispensingState();
+
+
+
 
     void dispenseProduct(const Product& product, int money);
 };

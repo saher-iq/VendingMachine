@@ -101,14 +101,9 @@ TEST(VendingMachineTests, ExtraMoneyReturnsCorrectChange) {
 TEST(VendingMachineTests, MachineReturnsToReadyStateAfterPurchase) {
     VendingMachine machine;
 
+    EXPECT_EQ(machine.getCurrentState(), machine.getReadyState());
+
     captureOutput(machine, 1, 500);
 
-    EXPECT_EQ(machine.getReadyState(), machine.getDispensingState() == nullptr
-        ? nullptr
-        : machine.getReadyState());
-
-    std::string output = captureOutput(machine, 2, 1000);
-
-    EXPECT_NE(output.find("Purchase successful!"), std::string::npos);
-    EXPECT_NE(output.find("Product: Juice"), std::string::npos);
+    EXPECT_EQ(machine.getCurrentState(), machine.getReadyState());
 }
