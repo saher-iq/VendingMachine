@@ -107,3 +107,22 @@ TEST(VendingMachineTests, MachineReturnsToReadyStateAfterPurchase) {
 
     EXPECT_EQ(machine.getCurrentState(), machine.getReadyState());
 }
+
+// Test 10: The machine should remain in ReadyState when money is insufficient.
+TEST(VendingMachineTests, InsufficientMoneyKeepsMachineReady) {
+    VendingMachine machine;
+
+    captureOutput(machine, 1, 200);
+
+    EXPECT_EQ(machine.getCurrentState(), machine.getReadyState());
+}
+
+// Test 11: The machine should remain in ReadyState for an invalid choice.
+TEST(VendingMachineTests, InvalidChoiceKeepsMachineReady) {
+    VendingMachine machine;
+
+    captureOutput(machine, 4, 1000);
+
+    EXPECT_EQ(machine.getCurrentState(), machine.getReadyState());
+}
+
