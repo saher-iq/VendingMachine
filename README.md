@@ -150,7 +150,7 @@ ctest --test-dir build -C Debug --output-on-failure
 
 
 
-The project currently has 9 passing unit tests.
+The project currently has 11 passing unit tests.
 
 
 
