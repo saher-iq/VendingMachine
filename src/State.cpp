@@ -5,6 +5,9 @@
 
 using namespace std;
 
+/**
+ * @brief Handles purchase requests while the machine is ready.
+ */
 void ReadyState::buy(VendingMachine& machine, int choice, int money) {
     Product* product = machine.getProduct(choice);
 
@@ -20,19 +23,17 @@ void ReadyState::buy(VendingMachine& machine, int choice, int money) {
 
     if (money < product->getPrice()) {
         cout << "Not enough money!\n";
-        cout << "You need "
-            << product->getPrice() - money
-            << " IQD more.\n";
+        cout << "You need " << product->getPrice() - money << " IQD more.\n";
         return;
     }
 
-    // Change to DispensingState before processing the purchase.
     machine.setState(machine.getDispensingState());
-
-    // The purchase is now handled by DispensingState.
     machine.buyProduct(choice, money);
 }
 
+/**
+ * @brief Handles product dispensing and returns the machine to ready state.
+ */
 void DispensingState::buy(VendingMachine& machine, int choice, int money) {
     Product* product = machine.getProduct(choice);
 
@@ -43,7 +44,5 @@ void DispensingState::buy(VendingMachine& machine, int choice, int money) {
     }
 
     machine.dispenseProduct(*product, money);
-
-    // Return to ReadyState after dispensing the product.
     machine.setState(machine.getReadyState());
 }

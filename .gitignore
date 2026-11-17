@@ -14,3 +14,6 @@ build/
 *.ilk
 *.obj
 *.exe
+# Doxygen temporary files
+docs/html/
+docs/latex/
